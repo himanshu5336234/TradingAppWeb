@@ -1,0 +1,55 @@
+version: 0.2
+
+env:
+  git-credential-helper: yes
+  secrets-manager:
+    DOCKERHUB_PASS: "dockerhub/credentials:password"
+    DOCKERHUB_USERNAME: "dockerhub/credentials:username"
+phases:
+  install:
+    on-failure: ABORT
+    commands:
+      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2 &
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
+      - echo login to docker hub...
+      - docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASS
+      - REPOSITORY_URI=083947760274.dkr.ecr.ap-south-1.amazonaws.com/density-frontend-${ENV}
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+      - export VERSION=$IMAGE_TAG
+  pre_build:
+    on-failure: ABORT
+    commands:
+      - echo Removing the directory src/frontend-BL
+      - rm -rf src/frontend-BL
+      - rm -rf src/frontend-api-service
+      - echo updating submodules
+      - git submodule sync
+      - git submodule update --init --remote --recursive
+      - git submodule foreach --recursive git checkout Production
+      - git submodule foreach --recursive git pull origin Production
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin  083947760274.dkr.ecr.ap-south-1.amazonaws.com
+  build:
+    on-failure: ABORT
+    commands:
+      - echo Build started on `date`
+      - echo BUILD_TYPE=${BUILD_TYPE}
+      - echo "$(make check-build-type)"
+      - echo Building the Docker image with version $VERSION
+      - make container
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - make docker-push
+      - echo Writing image definitions file...
+      - printf '[{"name":"frontend-dev","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+
+cache:
+  paths:
+    - 'node_modules/**/*'
+    - '/root/.npm/**/*'
+
+artifacts:
+  files: imagedefinitions.json

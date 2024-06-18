@@ -1,0 +1,181 @@
+name: test Server Deploy
+
+on:
+  pull_request:
+    branches: feature/production
+    types: [assigned, opened, synchronize, reopened, edited, labeled]
+
+  workflow_dispatch:
+env:
+  VITE_BUILD_TYPE: pre-production
+  REACT_APP_PUBLIC_POSTHOG_KEY: "phc_gUZ99ORMqVlkoOYR7jiIy8k1ncp9HDzxyohW88CN6Sb"
+  REACT_APP_PUBLIC_POSTHOG_URL: https://app.posthog.com
+
+jobs:
+  testing_build_deploy:
+    if: contains(github.event.pull_request.labels.*.name, 'deploy_test')
+    # if: github.event.label.name == 'deploy_sf'
+    runs-on: ubuntu-latest
+    env:
+      VITE_BUILD_TYPE: pre-production
+      REACT_APP_PUBLIC_POSTHOG_KEY: "phc_gUZ99ORMqVlkoOYR7jiIy8k1ncp9HDzxyohW88CN6Sb"
+      REACT_APP_PUBLIC_POSTHOG_URL: https://app.posthog.com
+    steps:
+
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.FRONTEND_SUBMODULE_PAT }}
+          submodules: recursive
+
+      - name: Read submodule branch
+        id: package
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./.submoduleConfig
+
+      - name: Checkout specified on all submodules
+        run: |
+          git submodule foreach git pull origin ${{ steps.package.outputs.content }}
+
+      - name: Setup Node Env
+        uses: actions/setup-node@v3.2.0
+
+      - name: Install Dependencies
+        run: npm ci --legacy-peer-deps
+
+      # - name: Linting
+      #   run: npm run lint
+
+      # - name: Slack Notification Linting
+      #   uses: rtCamp/action-slack-notify@v2.2.0
+      #   env:
+      #     SLACK_COLOR: ${{ job.status }}
+      #     SLACK_ICON: ${{ secrets.LOGO }}
+      #     SLACK_USERNAME: Density Devops Bot
+      #     SLACK_MESSAGE: Linting ${{ job.status }}
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Prettier Adjustment
+        run: npm run prettier:write
+
+      - name: Slack Notification Prettier
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: ${{ secrets.LOGO }}
+          SLACK_USERNAME: Density Devops Bot
+          SLACK_MESSAGE: Code Formatting ${{ job.status }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Running Test Cases
+        run: npm run test
+
+      - name: Slack Notification Testing
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: ${{ secrets.LOGO }}
+          SLACK_USERNAME: Density Devops Bot
+          SLACK_MESSAGE: Test Cases ${{ job.status }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to GAR
+        uses: docker/login-action@v3
+        with:
+          registry: asia-south1-docker.pkg.dev/density-dev-app-layer/density-dev-artifact-registry/density-frontend
+          username: _json_key
+          password: ${{ secrets.DENSITY_DEV_GITHUB_GAR_SA }}
+      - name: Building Docker Image
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: ${{ secrets.LOGO }}
+          SLACK_USERNAME: Density Devops Bot
+          SLACK_MESSAGE: Building Docker Image
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Set short SHA
+        id: sha
+        run: |
+          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo $sha_short
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: density-frontend-prod
+          IMAGE_TAG: ${{ steps.sha.outputs.sha_short }}
+          REACT_APP_PUBLIC_POSTHOG_KEY: ${{ secrets.REACT_APP_PUBLIC_POSTHOG_KEY }}
+          REACT_APP_PUBLIC_POSTHOG_URL: ${{ secrets.REACT_APP_PUBLIC_POSTHOG_URL }}
+        run: |
+          docker build --build-arg BUILD_TYPE=pre-production --build-arg REACT_APP_PUBLIC_POSTHOG_KEY=$REACT_APP_PUBLIC_POSTHOG_KEY --build-arg  REACT_APP_PUBLIC_POSTHOG_URL=$REACT_APP_PUBLIC_POSTHOG_URL -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Slack Notification Docker
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: ${{ secrets.LOGO }}
+          SLACK_USERNAME: Density Devops Bot
+          SLACK_MESSAGE: Docker Image Pushed to ECR ${{ job.status }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: 'density-exchange/deployment-k8s'
+          token: ${{ secrets.PAT_ACCESS_SECRET }}
+          path: deployment-k8s
+          ref: develop
+
+      - name: Slack Notification K8
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: ${{ secrets.LOGO }}
+          SLACK_USERNAME: Density Devops Bot
+          SLACK_MESSAGE: Initiating Argo Deployment
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+      # - name: Update K8s
+      #   run: |
+      #     echo "This file is managed by Github Actions.\n#Please don't overwrite manually"
+      #     cd deployment-k8s/projects/density-frontend/production/helm-density-frontend
+      #     yq -i '(.image.staging_tag) = "${{ steps.sha.outputs.sha_short }}"' values.yaml
+      #     git diff
+      #     git config user.name ${{ github.actor }}
+      #     git config user.email ${{ github.actor }}+github@noreply.com
+      #     git add .
+      #     git commit -m "released staging"
+      #     git push
+
+      # - name: Update GCP K8s
+      #   run: |
+      #     echo "This file is managed by Github Actions.\n#Please don't overwrite manually"
+      #     cd deployment-k8s/projects/density-frontend/development-gcp/density-frontend-helm
+      #     yq -i '(.image.staging_tag) = "${{ steps.sha.outputs.sha_short }}"' values-dev.yaml
+      #     git diff
+      #     git config user.name ${{ github.actor }}
+      #     git config user.email ${{ github.actor }}+github@noreply.com
+      #     git add .
+      #     git commit -m "test"
+      #     git push
+      # - name: Slack Notification Deployment
+      #   uses: rtCamp/action-slack-notify@v2.2.0
+      #   env:
+      #     SLACK_COLOR: ${{ job.status }}
+      #     SLACK_ICON: ${{ secrets.LOGO }}
+      #     SLACK_USERNAME: Density Devops Bot
+      #     SLACK_MESSAGE: SF Server Deployment ${{ job.status }}
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}

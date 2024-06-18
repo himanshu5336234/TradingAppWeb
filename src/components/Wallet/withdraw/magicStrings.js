@@ -1,0 +1,17 @@
+export const ENTER_OTP = " Enter OTP";
+export const VERIFICATION_CODE_SENT_TEXT = " We have sent a verification code on your registration number";
+export const REQUEST_WITHDRAWAL_TEXT_1 = "  Request for withdrawal amount of";
+export const REQUEST_WITHDRAWAL_TEXT_2 = " INR has been submitted successfully. Please wait while we proccess your request. We appreciate your patience!";
+export const WITHDRAW_INR = "Withdraw INR";
+export const ENTER_WITHDRAW_AMT = "Enter Withdrawal Amount";
+export const USDT = "USDT";
+export const INR = "INR";
+export const MAX = "MAX";
+export const WITHDRAW_AMT_5000 = "₹ 5000";
+export const WITHDRAW_AMT_2000 = "₹ 2000";
+export const WITHDRAW_AMT_1000 = "₹ 1000";
+export const WITHDRAW_AMT_500 = "₹ 500";
+export const BANK_DETAILS = "Bank Details";
+export const ACCOUNT_NUMBER = "Account Number";
+export const ACCOUNT_IFSC_CODE = "IFSC Code";
+export const SUCCESS = "Success";

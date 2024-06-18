@@ -1,0 +1,299 @@
+import * as configureStore from "../../redux/store/configureStore";
+import { useDispatch, useSelector } from "react-redux";
+import { act, renderHook } from "@testing-library/react";
+import { OTOCO_PARAMS, tickerPricemock } from "./OCOConstants";
+import { tradablesymbolListMock } from "./Constant";
+import { useOtOCOForOpenOrders } from "../../businessHooks/ORDER_FORM/useOTOCOForOpenOrders";
+jest.mock("react-redux", () => ({
+  ...jest.requireActual("react-redux"),
+  useSelector: jest.fn(),
+  useDispatch: jest.fn()
+}));
+
+describe("OCO Orders", () => {
+  let store;
+  beforeEach(async () => {
+    store = configureStore.default;
+    useSelector.mockImplementation((callback) => callback(store.getState()));
+    useDispatch.mockImplementation(() => () => jest.fn());
+    const binanceDataCopy = {};
+    binanceDataCopy[`btcusdt@ticker`] = tickerPricemock.data.c;
+    binanceDataCopy[`maticusdt@ticker`] = "0.85610";
+    binanceDataCopy[`galausdt@ticker`] = "0.03661";
+    binanceDataCopy[`ethusdt@ticker`] = "2149.31";
+    binanceDataCopy[`bnbusdt@ticker`] = "317.780";
+    store.dispatch({ type: "SET_BINANCE_DATA", payload: binanceDataCopy });
+    store.dispatch({
+      type: "SET_TRADABLE_SYMBOL_LIST_SUCCESS",
+      payload: { tradablesymbolList: tradablesymbolListMock.symbols }
+    });
+  });
+  afterEach(() => {
+    useSelector.mockClear();
+    useDispatch.mockClear();
+  });
+
+  it("otoco test Sell LIMIT Take Profit", () => {
+    const { result } = renderHook(() =>
+      useOtOCOForOpenOrders({
+        ...OTOCO_PARAMS.SELL_BTC_LIMIT_TP
+      })
+    );
+    expect(result.current.getEstimatedPnL()).toBe("6 USDT");
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "0" } })
+    );
+    act(() => result.current.handleCheckClick());
+    expect(result.current.priceError).toBe("Price can not be zero");
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "46500" } })
+    );
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("--/--");
+    expect(result.current.priceError).toBe(
+      "TP value should be less than the Limit price of the parent order"
+    );
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "45500" } })
+    );
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("0 USDT");
+    expect(result.current.priceError).toBe("");
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "43500" } })
+    );
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("6 USDT");
+    expect(result.current.priceError).toBe("");
+  });
+
+  it("otoco test Sell LIMIT Stop Loss", () => {
+    const { result } = renderHook(() =>
+      useOtOCOForOpenOrders({
+        ...OTOCO_PARAMS.SELL_BTC_LIMIT_SL
+      })
+    );
+    expect(result.current.getEstimatedPnL()).toBe("3 USDT");
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "43500" } })
+    );
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("--/--");
+    expect(result.current.priceError).toBe(
+      "SL value should be greater than the Limit price of the parent order"
+    );
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "45500" } })
+    );
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("0 USDT");
+    expect(result.current.priceError).toBe("");
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "48500" } })
+    );
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("9 USDT");
+    expect(result.current.priceError).toBe("");
+  });
+
+  it("otoco test Buy LIMIT Stop Loss", () => {
+    const { result } = renderHook(() =>
+      useOtOCOForOpenOrders({
+        ...OTOCO_PARAMS.BUY_BTC_LIMIT_SL
+      })
+    );
+    expect(result.current.getEstimatedPnL()).toBe("12 USDT");
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "47500" } })
+    );
+
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("--/--");
+    expect(result.current.priceError).toBe(
+      "SL value should be less than the Limit price of the parent order"
+    );
+
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "42500" } })
+    );
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("9 USDT");
+    expect(result.current.priceError).toBe("");
+  });
+
+  it("otoco test Buy LIMIT take profit", () => {
+    const { result } = renderHook(() =>
+      useOtOCOForOpenOrders({
+        ...OTOCO_PARAMS.BUY_BTC_LIMIT_TP
+      })
+    );
+    expect(result.current.getEstimatedPnL()).toBe("6 USDT");
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "41500" } })
+    );
+
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("--/--");
+    expect(result.current.priceError).toBe(
+      "TP value should be greater than the Limit price of the parent order"
+    );
+
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "49000" } })
+    );
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("10.5 USDT");
+    expect(result.current.priceError).toBe("");
+  });
+
+  it("otoco test Buy STOP take profit", () => {
+    const { result } = renderHook(() =>
+      useOtOCOForOpenOrders({
+        ...OTOCO_PARAMS.BUY_BTC_STOP_TP
+      })
+    );
+    expect(result.current.getEstimatedPnL()).toBe("9 USDT");
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "41500" } })
+    );
+
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("--/--");
+    expect(result.current.priceError).toBe(
+      "TP value should be greater than the Limit price of the parent order"
+    );
+
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "49000" } })
+    );
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("10.5 USDT");
+    expect(result.current.priceError).toBe("");
+  });
+
+  it("otoco test Buy STOP SL", () => {
+    const { result } = renderHook(() =>
+      useOtOCOForOpenOrders({
+        ...OTOCO_PARAMS.SELL_BTC_STOP_SL
+      })
+    );
+    expect(result.current.getEstimatedPnL()).toBe("4.5 USDT");
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "42500" } })
+    );
+
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("--/--");
+    expect(result.current.priceError).toBe(
+      "SL value should be greater than the Limit price of the parent order"
+    );
+
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "45000" } })
+    );
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("6 USDT");
+    expect(result.current.priceError).toBe("");
+  });
+
+  it("otoco test Buy Take profit market TP", () => {
+    const { result } = renderHook(() =>
+      useOtOCOForOpenOrders({
+        ...OTOCO_PARAMS.BUY_BTC_TAKE_PROFIT_TP
+      })
+    );
+    expect(result.current.getEstimatedPnL()).toBe("4.5 USDT");
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "42500" } })
+    );
+
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("--/--");
+    expect(result.current.priceError).toBe(
+      "TP value should be greater than the trigger price of the parent order"
+    );
+
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "46000" } })
+    );
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("7.5 USDT");
+    expect(result.current.priceError).toBe("");
+  });
+
+  it("otoco test SELL STOP Market SL", () => {
+    const { result } = renderHook(() =>
+      useOtOCOForOpenOrders({
+        ...OTOCO_PARAMS.SELL_BTC_STOP_MARKET_SL
+      })
+    );
+    expect(result.current.getEstimatedPnL()).toBe("4.5 USDT");
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "42500" } })
+    );
+
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("--/--");
+    expect(result.current.priceError).toBe(
+      "SL value should be greater than the trigger price of the parent order"
+    );
+
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "46000" } })
+    );
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("7.5 USDT");
+    expect(result.current.priceError).toBe("");
+  });
+
+  it("otoco test BUY take profit Market SL", () => {
+    const { result } = renderHook(() =>
+      useOtOCOForOpenOrders({
+        ...OTOCO_PARAMS.BUY_BTC_TAKE_PROFIT_SL
+      })
+    );
+    expect(result.current.getEstimatedPnL()).toBe("6 USDT");
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "44500" } })
+    );
+
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("--/--");
+    expect(result.current.priceError).toBe(
+      "SL value should be less than the trigger price of the parent order"
+    );
+
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "42500" } })
+    );
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("3 USDT");
+    expect(result.current.priceError).toBe("");
+  });
+
+  it("otoco test SELL Stop Market SL", () => {
+    const { result } = renderHook(() =>
+      useOtOCOForOpenOrders({
+        ...OTOCO_PARAMS.SELL_BTC_STOP_MARKET_TP
+      })
+    );
+    expect(result.current.getEstimatedPnL()).toBe("3 USDT");
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "44500" } })
+    );
+
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("--/--");
+    expect(result.current.priceError).toBe(
+      "TP value should be less than the trigger price of the parent order"
+    );
+
+    act(() =>
+      result.current.handleChangeUpdatedPrice({ target: { value: "41500" } })
+    );
+    act(() => result.current.handleCheckClick());
+    expect(result.current.getEstimatedPnL()).toBe("6 USDT");
+    expect(result.current.priceError).toBe("");
+    act(() => result.current.cancelAllStrategyOrders());
+  });
+});

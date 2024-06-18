@@ -1,0 +1,111 @@
+
+@font-face {
+  font-family: "Neurial-Light";
+  src: url('/fonts/Inter-Regular.woff') format("woff");
+
+}
+@font-face {
+  font-family: "Neurial-Regular";
+  src: url('/fonts/Inter-Regular.woff') format("woff");
+}
+@font-face {
+  font-family: "Number-Regular";
+  src: url('/fonts/Lato-Regular.woff') format("woff");
+}
+@font-face {
+  font-family: "Number-Bold";
+  src: url('/fonts/Lato-Bold.woff') format("woff");
+}
+@font-face {
+  font-family: "Neurial-Medium";
+  src: url('/fonts/Inter-Medium.woff') format("woff");
+  font-weight: 400;
+}
+@font-face {
+
+  font-family: "Neurial-SemiBold";
+  src: url('/fonts/Inter-SemiBold.woff') format("woff");
+}
+@font-face {
+  font-family: "Neurial-Bold";
+  src: url('/fonts/Inter-Bold.woff') format("woff");
+}
+
+.theme-dark:root {
+    --tv-color-platform-background: #1B1B1F;
+    --tv-color-pane-background: #1B1B1F;
+    --tv-color-pane-background-secondary: #1B1B1F;
+    --tv-color-toolbar-button-text: #B1B1BA;
+    --tv-color-toolbar-button-text-active:#e2ff6f;
+    --tv-color-toolbar-button-text-active-hover:#e2ff6f;
+}
+html.theme-dark .customButton-OOd_B2x2 ,.toolbar-uWw2aReP{
+  color: #B1B1BA;
+  font-size: 11px;
+}
+
+body{
+  font-family: "Neurial-Regular";
+  letter-spacing: 0.5px;
+  font-feature-settings:"normal";
+}
+/* top bar */
+.series-G1_Pfvwd .titleWrapper-G1_Pfvwd {
+  font-size: 12px;
+}
+.value-Os5mxnuv {
+  font-size: 13px;
+  text-align: left;
+}
+.toolbar-OOd_B2x2 {
+  font-size: 11px;
+  height: 100%;
+  padding: 0;
+  position: relative;
+}
+/* icon */
+.wrap-qKQlcmkd svg ,.icon-RhC5uhZw svg{
+  height: 20px;
+  display: block;
+}
+.item-G1_Pfvwd,.item-Jc9IXW74 {
+  
+  font-size: 12px;
+
+}
+
+/* sidebar icons */
+.button-mOEOjod4 .icon-mOEOjod4 svg {
+  vertical-align: middle;
+  width: 20px;
+}
+html.theme-dark .menuWrap-biWYdsXC {
+  background-color: #0E0E0F;
+  /* box-shadow:0 2px 4px #0006; */
+}
+html.theme-dark .item-RhC5uhZw {
+  font-size: 11px;
+  background-color: #0E0E0F;
+
+}
+html.theme-dark .item-RhC5uhZw.isActive-RhC5uhZw:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+html.theme-dark .item-RhC5uhZw.isActive-RhC5uhZw,html.theme-dark .item-RhC5uhZw.isActive-RhC5uhZw:active {
+ 
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* .layout__area--center{
+  left: 40px !important;
+}
+.layout__area--left{
+width: 35px !important;
+} */
+.inner-gmpTgcxI{
+  width: 100% !important;
+  align-items: center !important;
+}
+.layout__area--left > .inner-gmpTgcxI{
+  align-items: center;
+}

@@ -1,0 +1,36 @@
+.toast-success{
+  background-color: rgba(41, 181, 126, 0.4);
+  border: 1px solid #29B57E;
+  backdrop-filter: blur(20px);
+  width: 400px;
+  right: 30%;
+
+}
+.toast-error{
+  background-color: 
+  rgba(255, 101, 84, 0.4);
+  border: 1px solid #FF6554;
+  backdrop-filter: blur(20px);
+  width: 400px;
+  right: 30%;
+}
+.toast-warning{
+  background-color: rgba(233, 174, 24, 0.4);
+  border: 1px solid #E9AE18;
+  backdrop-filter: blur(20px);
+  width: 400px;
+  right: 30%;
+}
+/* .toast-info{
+  background-color:  rgba(41, 181, 126, 0.2);
+  border: 1px solid #29B57E;
+  backdrop-filter: blur(20px);
+} */
+
+@media only screen and (max-width: 480px) {
+  .toast-success, .toast-error, .toast-warning {
+    width: calc((100vw - 10%));
+    right:  -8%;
+    top: 10px;
+  }
+}

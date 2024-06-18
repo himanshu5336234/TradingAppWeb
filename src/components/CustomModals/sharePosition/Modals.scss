@@ -1,0 +1,15 @@
+.walletHeaderContainer .Mui-disabled {
+    -webkit-text-fill-color: #474747 !important;
+    background: #8A8A8A !important
+};
+.Mui-disabled::placeholder {
+    -webkit-text-fill-color: #808080 !important
+}
+
+.lightbox {
+    display: block;
+  }
+  
+  .hide-lightbox {
+    display: none;
+  }

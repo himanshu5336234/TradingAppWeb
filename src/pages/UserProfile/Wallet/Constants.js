@@ -1,0 +1,19 @@
+export const NOT_BANK_VERIFIED_TOOLTIP_TEXT = "Complete Your Bank Verification";
+export const NOT_KYC_VERIFIED_TOOLTIP_TEXT = "Complete Your Kyc";
+export const CONVERT_INR_USDT = "Convert USDT";
+export const INR_WALLET_BALANCE_MASK = "XXXXX";
+export const INR_DEPOSIT = "Deposit INR";
+export const INR_WITHDRAW = "Withdraw INR";
+export const ONE_USDT = "1 USDT ";
+export const ONE_INR = " INR";
+export const USDT = "USDT";
+export const INR = "INR";
+export const MAX = "MAX";
+export const INR_WALLET_BALANCE = "INR Wallet Balance";
+
+export const USDT_WALLET_AMT = "Total USDT Wallet Amount";
+export const FREE_USDT_AMT = "FREE USDT AMOUNT";
+export const CONVERT_USDT_INR = "Convert USDT";
+export const REALIZED_24HR_PL = "REALIZED 24h P&L";
+export const INR_WALLET = "INR WALLET";
+export const USDT_WALLET = "USDT WALLET";

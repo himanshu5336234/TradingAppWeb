@@ -1,0 +1,86 @@
+#marginRatioContainer{
+    background-color: #101010;
+    box-shadow: none;
+    border: 1px solid #4F4F4F;
+    max-width: 100%;
+    margin-bottom: 10px;
+    padding: 7px;
+}
+#marginRatioContainer .MuiInputBase-root {
+    height: 35px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+#marginRatioLabel, #marginRatioValue {
+    margin-top: 10px;
+}
+#maintenanceMarginContainer {
+    margin-top: 10px;
+}
+#marginBalanceContainer {
+    margin-bottom: 10px;
+}
+#marginBalanceLabel, #maintenanceMarginLabel {
+    color: #BDBDBD;
+}
+#marginBalanceValue, #maintenanceMarginValue {
+    color: #4F4F4F;
+}
+#maintenanceMarginContainer, #marginBalanceContainer, #marginRatioValueContainer {
+    display: flex;
+    justify-content: space-between;
+}
+#marginRatioProgress_1,#marginRatioProgress_2,#marginRatioProgress_3,#marginRatioProgress_4{
+    width: 56px;
+    height: 12px;
+}
+#marginRatioProgress_1 {
+
+    background: linear-gradient(122.64deg, #D6FAF1 19.52%, rgba(139, 255, 225, 0.994628) 80.47%, #9FF9E2 80.48%);
+    opacity: 0.35;
+    border-radius: 8px 0px 0px 8px;
+
+}
+#marginRatioProgress_2{
+
+    background: linear-gradient(102.58deg, #9FF9E2 9.12%, #00FFBF 90.88%);
+    opacity: 0.35;
+}
+#marginRatioProgress_3{
+
+    background: linear-gradient(257.29deg, #E64646 9.2%, #FFA399 90.8%);
+    opacity: 0.35;
+}
+#marginRatioProgress_4{
+
+    background: linear-gradient(237.37deg, rgba(246, 83, 83, 0.41) 0%, #FF4C4C 100%);
+    opacity: 0.35;
+    border-radius: 0px 8px 8px 0px;
+}
+#marginRatioProgress_1_active {
+
+    background: linear-gradient(122.64deg, #D6FAF1 19.52%, rgba(139, 255, 225, 0.994628) 90.47%, #9FF9E2 90.48%);
+    border-radius: 8px 0px 0px 8px;
+    width: 56px;
+    height: 12px;
+
+}
+#marginRatioProgress_2_active {
+
+    background: linear-gradient(102.58deg, #9FF9E2 9.12%, #00FFBF 90.88%);
+    width: 56px;
+    height: 12px;
+}
+#marginRatioProgress_3_active {
+
+    background: linear-gradient(257.29deg, #E64646 9.2%, #FFA399 90.8%);
+    width: 56px;
+    height: 12px;
+}
+#marginRatioProgress_4_active{
+    
+    background: linear-gradient(237.37deg, rgba(255, 76, 76, 0.41) 19.52%, #FF4C4C 80.48%);
+    border-radius: 0px 8px 8px 0px;
+    width: 56px;
+    height: 12px;
+}

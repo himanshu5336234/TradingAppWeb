@@ -1,0 +1,151 @@
+
+@font-face {
+  font-family: "Neurial-Light";
+  src: url('/fonts/Inter-Regular.woff') format("woff");
+
+}
+@font-face {
+  font-family: "Neurial-Regular";
+
+  src: url('/fonts/Inter-Regular.woff') format("woff");
+}
+@font-face {
+  font-family: "Neurial-Medium";
+
+  src: url('/fonts/Inter-Medium.woff') format("woff");
+  font-weight: 400;
+}
+@font-face {
+
+  font-family: "Neurial-SemiBold";
+  src: url('/fonts/Inter-SemiBold.woff') format("woff");
+}
+@font-face {
+  font-family: "Neurial-Bold";
+
+  src: url('/fonts/Inter-Bold.woff') format("woff");
+}
+
+
+*{box-sizing: border-box;   letter-spacing: 0.5px;}
+::-webkit-scrollbar {
+  overflow: auto;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  font-size: 14px;
+  -moz-appearance: textfield;
+}
+.MuiTypography-root-MuiDayPicker-weekDayLabel {
+  color: #ffff !important;
+}
+.css-ea04id-MuiTypography-root-MuiDayPicker-weekDayLabel {
+  color: #ffff !important;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 0px;
+}
+input:focus-visible {
+  outline: none;
+}
+/* Track */
+::-webkit-scrollbar-track {
+background-color: transparent;
+  
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  border-radius: 40px;
+}
+
+/* Handle on hover */
+::selection {
+  color: black;
+  background-color: #a9a9a9;
+}
+
+.introjs-tooltipbuttons {
+  display: flex;
+  justify-content: flex-end;
+  background-color: #f4f4f4;
+}
+
+.introjs-button {
+  text-shadow: none;
+  border-radius: 0px;
+  padding: 3px 20px;
+}
+
+.introjs-prevbutton {
+  background-color: #fff;
+  color: #000;
+  margin-right: 10px;
+}
+
+.introjs-nextbutton {
+  color: #fff;
+  background: #000;
+  border: none;
+}
+
+.introjs-nextbutton:hover,
+.introjs-nextbutton:focus {
+  color: #fff;
+  background: #000;
+  border: none;
+  box-shadow: none;
+}
+
+.introjs-tooltip-title {
+  height: 0px;
+  display: none;
+}
+
+.introjs-tooltiptext {
+  padding: 0 20px;
+}
+
+.introjs-skipbutton {
+  color: #000;
+  font-weight: 200;
+  font-size: 30px;
+}
+
+.introjs-tooltip {
+  padding: 0;
+  border-radius: 0px;
+  width: 25vw;
+  max-width: 25vw;
+  color: #000;
+}
+
+.introjs-helperNumberLayer {
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 20px;
+  color: #000;
+  font-weight: 450;
+  padding: 0;
+}
+
+.introjs-tooltiptext > h6 {
+  font-size: 16px;
+  line-height: 1;
+  margin: 0 0 20px 0;
+}
+
+.introjs-tooltiptext > p {
+  font-size: 12px;
+  color: #000;
+  font-weight: 400;
+}

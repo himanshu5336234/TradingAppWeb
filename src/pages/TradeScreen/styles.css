@@ -1,0 +1,37 @@
+
+
+.grid-item {
+
+  /* border: 1px solid #141414; */
+  display: flex;
+  position: relative;
+  flex-direction: column;
+}
+.react-grid-item > .react-resizable-handle::after{
+  content: "";
+   display: none;
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 5px;
+  height: 5px;
+  border-right: 2px solid #50535e;
+  border-bottom: 2px solid #50535e;
+}
+.react-grid-item img{
+  pointer-events:all
+}
+.grid-item__title {
+cursor: grab;
+}
+.grid-item_close{
+  display: none;
+}
+.grid-item:hover .grid-item_close , .grid-item:hover .react-resizable-handle::after{
+  display: block;
+  cursor: pointer;
+}
+
+.grid-item__graph {
+height: 100%;
+}
